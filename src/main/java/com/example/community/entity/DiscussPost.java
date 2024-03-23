@@ -1,17 +1,36 @@
 package com.example.community.entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import java.util.Date;
 
+//添加@Document注解将实体类与es中的索引相映射
+@Document(indexName = "discusspost")
 public class DiscussPost {
 
+    @Id
     private int id;
+    @Field(type = FieldType.Integer)
     private int userId;
+//    analyzer是存储时使用的分词器，ik_max_word表示尽可能多的分词
+//    searchAnalyzer是搜索时使用的分词器，ik_smart表示智能的搜索
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String title;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;
+    @Field(type = FieldType.Integer)
     private int type;
+    @Field(type = FieldType.Integer)
     private int status;
+    @Field(type = FieldType.Date, format= DateFormat.date_optional_time)
     private Date createTime;
+    @Field(type = FieldType.Integer)
     private int commentCount;
+    @Field(type = FieldType.Double)
     private double score;
 
     public int getId() {

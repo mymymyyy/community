@@ -97,6 +97,7 @@
 						</div>
 						<div class="col-sm-4">
 							<img th:src="@{/kaptcha}" id="kaptcha" style="width:100px;height:40px;" class="mr-2"/>
+<!--							<img th:src="@{/kaptcha}" id="kaptcha" style="width:100px;height:40px;" class="mr-2" onclick="refresh_kaptcha()"/>-->
 							<a href="javascript:refresh_kaptcha();" class="font-size-12 align-bottom">刷新验证码</a>
 						</div>
 					</div>
@@ -188,7 +189,7 @@
 
 	<script>
 		function refresh_kaptcha() {
-			//加随机数欺骗浏览器访问路劲变了
+			//加随机数欺骗浏览器访问路径变了
 			var path = CONTEXT_PATH + "/kaptcha?p=" + Math.random();
 			$("#kaptcha").attr("src", path);
 		}
