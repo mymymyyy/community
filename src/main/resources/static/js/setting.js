@@ -27,7 +27,8 @@ function upload() {
     // processData:false 不把表单的内容转为字符串
     // contentType:false 不让jQuery设置上传的类型，浏览器会自动的进行设置
     $.ajax({
-        url: "http://upload-z1.qiniup.com",
+        // 七牛云华东浙江存储区域源站上传域名
+        url: "http://up-z0.qiniup.com",
         method: "post",
         // 是否需要把表单的内容转换为字符串
         processData: false,

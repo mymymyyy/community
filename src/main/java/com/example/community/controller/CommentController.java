@@ -8,7 +8,9 @@ import com.example.community.service.CommentService;
 import com.example.community.service.DiscussPostService;
 import com.example.community.util.CommunityConstant;
 import com.example.community.util.HostHolder;
+import com.example.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +32,9 @@ public class CommentController implements CommunityConstant {
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(path = "/add/{discussPostId}")
     public String addComment(Comment comment, @PathVariable("discussPostId") int discussPostId){
@@ -53,8 +58,22 @@ public class CommentController implements CommunityConstant {
             Comment target = commentService.findCommentById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
         }
-
         eventProducer.fireEvent(event);
+
+//        如果是对帖子的评论，则需要同步修改帖子的评论数量，即修改数据库和es中的帖子的评论数量字段
+        if (comment.getEntityType() == ENTITY_TYPE_POST){
+//            触发发帖事件
+            event = new Event()
+                    .setTopic(TOPIC_PUBLISH)
+                    .setUserId(comment.getUserId())
+                    .setEntityType(ENTITY_TYPE_POST)
+                    .setEntityId(discussPostId);
+            eventProducer.fireEvent(event);
+
+            //        计算帖子分数
+            String redisKey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(redisKey, discussPostId);
+        }
 
         return "redirect:/discuss/detail/" + discussPostId;
     }
